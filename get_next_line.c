@@ -6,7 +6,7 @@
 /*   By: jlong <jlong@student.s19.be>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/05 10:12:59 by jlong             #+#    #+#             */
-/*   Updated: 2021/05/06 15:07:59 by jlong            ###   ########.fr       */
+/*   Updated: 2021/05/06 15:52:00 by jlong            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,8 @@ int		get_next_line(int fd, char **line)
 	if (!fd || !line)
 		return (-1);
 	endline = checknextline(nextline, line);
+	if (endline)
+		return (1);
 	ret = read(fd, buf, BUFFER_SIZE);
 	while (ret && !endline)
 	{
