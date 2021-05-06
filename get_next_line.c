@@ -5,145 +5,110 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlong <jlong@student.s19.be>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/04/18 12:00:24 by jlong             #+#    #+#             */
-/*   Updated: 2021/04/18 15:09:06 by jlong            ###   ########.fr       */
+/*   Created: 2021/05/05 10:12:59 by jlong             #+#    #+#             */
+/*   Updated: 2021/05/06 15:07:59 by jlong            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include "get_next_line.h"
-
+#include "get_next_line.h"
 #include <stdio.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <unistd.h>
 
-size_t	ft_strlen(const char *s)
-{
-	unsigned int	i;
-
-	i = 0;
-	while (s[i] != '\0')
-	{
-		i++;
-	}
-	return (i);
-}
-char	*ft_strchr(const char *s, int c)
-{
-	size_t	i;
-	unsigned char	*ss;
-
-	ss = (unsigned char *)s;
-	i = -1;
-	while (++i < ft_strlen(s))
-		if (ss[i] == (char)c)
-			return ((char *)&ss[i]);
-	if (ss[i] == (char)c)
-		return ((char *)&ss[i]);
-	return (NULL);
-}
-char	*ft_strdup(const char *s1)
-{
-	int		i;
-	int		size;
-	char	*dst;
-
-	size = 0;
-	while (s1[size])
-		size++;
-	dst = malloc(sizeof(char) * (size + 1));
-	if (!(dst))
-		return (NULL);
-	i = 0;
-	while (s1[i])
-	{
-		dst[i] = s1[i];
-		i++;
-	}
-	dst[i] = '\0';
-	return (dst);
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	int		i;
-	int		j;
-	char	*dst;
-
-	i = -1;
-	j = -1;
-	dst = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
-	if (!dst)
-		return (NULL);
-	while (s1[++i] != '\0')
-	{
-		dst[++j] = s1[i];
-	}
-	i = -1;
-	while (s2[++i] != '\0')
-	{
-		dst[++j] = s2[i];
-	}
-	dst[++j] = '\0';
-	return (dst);
-}
 char	*ft_strnew(size_t size)
 {
-	char *str;
+	char	*str;
 
 	str = (char *)malloc(sizeof(char) * (size + 1));
-	if (str == NULL)
+	if (!str)
 		return (NULL);
 	while (size > 0)
 		str[size--] = '\0';
 	str[0] = '\0';
 	return (str);
 }
-char	*check_reminder(char *reminder, char **line)
+
+char	*ft_strcpy(char *dest, char *src)
 {
-	char *p_n;
-	p_n = NULL;
-	if (reminder)
+	int	i;
+
+	i = 0;
+	while (src[i])
 	{
-		if ((p_n = ft_strchr(reminder, '\n')))
-		{
-			*line = ft_strdup(reminder);
-		}
+		dest[i] = src[i];
+		i++;
 	}
-	else
+	dest[i] = '\0';
+	return (dest);
+}
+
+void	ft_strclr(char *s)
+{
+	if (s)
 	{
-		*line = ft_strnew(1);
+		while (*s)
+		{
+			*s = '\0';
+			s++;
+		}
 	}
 }
-int	get_next_line(int fd, char **line)
+
+char	*checknextline(char *nextline, char **line)
 {
-	char		buf[1000 + 1];
-	int			byte_was_read;
-	char		*p_n;
-	int			flag;
-	static char	*reminder;
+	char	*endline;
 
-	flag = 1;
-	if (reminder)
-		*line = ft_strdup(reminder);
-	else
-		*line = ft_strnew(1);
-	while (flag && (byte_was_read = read (fd, buf, 1000)))
+	endline = NULL;
+	if (nextline)
 	{
-		buf[byte_was_read] = '\0';
-		if ((p_n = ft_strchr(buf, '\n')))
+		endline = ft_strchr(nextline, '\n');
+		if (endline)
 		{
-			*p_n = '\0';
-			flag = 0;
-			reminder = ft_strdup(p_n);
+			*endline = '\0';
+			*line = ft_strdup(nextline);
+			ft_strcpy(nextline, ++endline);
 		}
-		*line = ft_strjoin(*line, buf);
+		else
+		{
+			*line = ft_strdup(nextline);
+			ft_strclr(nextline);
+		}
 	}
+	else
+	{
+		*line = ft_strnew(1);
+	}
+	return (endline);
+}
 
+int		get_next_line(int fd, char **line)
+{
+	int				ret;
+	char			buf[BUFFER_SIZE + 1];
+	char			*endline;
+	static char		*nextline;
+	char			*tmp;
+
+	if (!fd || !line)
+		return (-1);
+	endline = checknextline(nextline, line);
+	ret = read(fd, buf, BUFFER_SIZE);
+	while (ret && !endline)
+	{
+		buf[ret] = '\0';
+		endline = ft_strchr(buf ,'\n');
+		if (endline)
+		{
+			*endline = '\0';
+			endline++;
+			nextline = ft_strdup(endline);
+		}
+		tmp = *line;
+		*line = ft_strjoin(*line, buf);
+		free(tmp);
+	}
+	// encore retourner le -1 ou 0 ou 1
 	return (0);
 }
-
-int	main(void)
+/* int	main(void)
 {
 	char	*line;
 	int		fd;
@@ -158,6 +123,28 @@ int	main(void)
 	get_next_line(fd, &line);
 	printf("%s\n", line);
 
+	get_next_line(fd, &line);
+	printf("%s\n", line);
 
+	get_next_line(fd, &line);
+	printf("%s\n", line);
 
+	get_next_line(fd, &line);
+	printf("%s\n", line);
+
+	get_next_line(fd, &line);
+	printf("%s\n", line);
+
+	get_next_line(fd, &line);
+	printf("%s\n", line);
+
+	get_next_line(fd, &line);
+	printf("%s\n", line);
+
+	get_next_line(fd, &line);
+	printf("%s\n", line);
+
+	get_next_line(fd, &line);
+	printf("%s\n", line);
 }
+*/
