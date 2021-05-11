@@ -6,7 +6,7 @@
 /*   By: jlong <jlong@student.s19.be>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/05 10:12:59 by jlong             #+#    #+#             */
-/*   Updated: 2021/05/06 15:52:00 by jlong            ###   ########.fr       */
+/*   Updated: 2021/05/11 09:19:53 by jlong            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,35 +66,40 @@ char	*checknextline(char *nextline, char **line)
 			*line = ft_strdup(nextline);
 			ft_strcpy(nextline, ++endline);
 		}
-		else
+		else 
 		{
 			*line = ft_strdup(nextline);
 			ft_strclr(nextline);
+			return (0);
 		}
 	}
 	else
-	{
-		*line = ft_strnew(1);
-	}
+		*line = ft_strnew(0);
 	return (endline);
 }
-
+int 	ft_returngood(int ret)
+{
+	return (ret != 0);
+}
 int		get_next_line(int fd, char **line)
 {
 	int				ret;
-	char			buf[BUFFER_SIZE + 1];
+	char			*buf;
 	char			*endline;
 	static char		*nextline;
 	char			*tmp;
 
-	if (!fd || !line)
+	buf = '\0';
+	ret = 1;
+	if (fd < 0 || !line || read(fd, buf, 0) == -1 || BUFFER_SIZE <= 0)
+		return (-1);
+	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!buf)
 		return (-1);
 	endline = checknextline(nextline, line);
-	if (endline)
-		return (1);
-	ret = read(fd, buf, BUFFER_SIZE);
-	while (ret && !endline)
+	while (!endline && ret != 0)
 	{
+		ret = read(fd, buf, BUFFER_SIZE);
 		buf[ret] = '\0';
 		endline = ft_strchr(buf ,'\n');
 		if (endline)
@@ -107,46 +112,33 @@ int		get_next_line(int fd, char **line)
 		*line = ft_strjoin(*line, buf);
 		free(tmp);
 	}
-	// encore retourner le -1 ou 0 ou 1
-	return (0);
+	free(buf);
+	return (ft_returngood(ret));
 }
-/* int	main(void)
+
+/*int	main(void)
 {
 	char	*line;
 	int		fd;
-
 	fd = open("text.txt", O_RDONLY);
-	get_next_line(fd, &line);
+	printf("%d\n",get_next_line(fd, &line));
 	printf("%s\n", line);
 
-	get_next_line(fd, &line);
+	printf("%d\n",get_next_line(fd, &line));
 	printf("%s\n", line);
 
-	get_next_line(fd, &line);
+	printf("%d\n",get_next_line(fd, &line));
 	printf("%s\n", line);
 
-	get_next_line(fd, &line);
+	printf("%d\n",get_next_line(fd, &line));
 	printf("%s\n", line);
 
-	get_next_line(fd, &line);
+	printf("%d\n",get_next_line(fd, &line));
 	printf("%s\n", line);
 
-	get_next_line(fd, &line);
+	printf("%d\n",get_next_line(fd, &line));
 	printf("%s\n", line);
 
-	get_next_line(fd, &line);
-	printf("%s\n", line);
-
-	get_next_line(fd, &line);
-	printf("%s\n", line);
-
-	get_next_line(fd, &line);
-	printf("%s\n", line);
-
-	get_next_line(fd, &line);
-	printf("%s\n", line);
-
-	get_next_line(fd, &line);
-	printf("%s\n", line);
+	
 }
 */

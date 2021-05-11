@@ -6,7 +6,7 @@
 /*   By: jlong <jlong@student.s19.be>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/18 12:00:26 by jlong             #+#    #+#             */
-/*   Updated: 2021/05/06 15:52:01 by jlong            ###   ########.fr       */
+/*   Updated: 2021/05/07 13:06:05 by jlong            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,10 @@
 # include <fcntl.h>
 # include <stdlib.h>
 # include <unistd.h>
+#include <stdio.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1000
+#  define BUFFER_SIZE 500
 # endif
 
 size_t	ft_strlen(const char *s);
