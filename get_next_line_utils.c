@@ -6,84 +6,79 @@
 /*   By: jlong <jlong@student.s19.be>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/18 12:00:29 by jlong             #+#    #+#             */
-/*   Updated: 2021/05/10 16:37:57 by jlong            ###   ########.fr       */
+/*   Updated: 2021/05/14 16:16:56 by jlong            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(const char *s)
+
+size_t		ft_strlen(const char *s)
 {
-	unsigned int	i;
+	int i;
 
 	i = 0;
+	if (!s)
+		return (0);
 	while (s[i] != '\0')
-	{
 		i++;
-	}
 	return (i);
 }
 
-char	*ft_strdup(const char *s1)
+void		*ft_memmove(void *dst, const void *src, size_t len)
 {
-	int		i;
-	int		size;
-	char	*dst;
+	char *d;
+	char *s;
 
-	size = 0;
-	while (s1[size])
-		size++;
-	dst = malloc(sizeof(char) * (size + 1));
-	if (!dst)
-		return (0);
-	i = 0;
-	while (s1[i])
+	d = (char *)dst;
+	s = (char *)src;
+	if (dst == src)
+		return (dst);
+	if (s < d)
 	{
-		dst[i] = s1[i];
+		while (len--)
+			*(d + len) = *(s + len);
+		return (dst);
+	}
+	while (len--)
+		*d++ = *s++;
+	return (dst);
+}
+
+char		*join_str(char const *s1, char const *s2)
+{
+	size_t	s1_len;
+	size_t	s2_len;
+	size_t	stot_len;
+	char	*rtn;
+
+	if (!s1 && !s2)
+		return (0);
+	s1_len = ft_strlen((char *)s1);
+	s2_len = ft_strlen((char *)s2);
+	stot_len = s1_len + s2_len + 1;
+	rtn = malloc(sizeof(char) * stot_len);
+	if (!rtn)
+		return (0);
+	ft_memmove(rtn, s1, s1_len);
+	ft_memmove(rtn + s1_len, s2, s2_len);
+	rtn[stot_len - 1] = '\0';
+	free((char *)s1);
+	return (rtn);
+}
+
+int			has_return(char *str)
+{
+	int i;
+
+	i = 0;
+	if (!str)
+		return (0);
+	while (str[i])
+	{
+		if (str[i] == '\n')
+			return (1);
 		i++;
 	}
-	dst[i] = '\0';
-	return (dst);
+	return (0);
 }
-
-char	*ft_strjoin(const char *s1,const char *s2)
-{
-	int		i;
-	int		j;
-	char	*dst;
-
-	i = -1;
-	j = -1;
-	if (!s1 || !s2)
-		return (NULL);
-	dst = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
-	if (!dst)
-		return (0);
-	while (s1[++i] != '\0')
-	{
-		dst[++j] = s1[i];
-	}
-	i = -1;
-	while (s2[++i] != '\0')
-	{
-		dst[++j] = s2[i];
-	}
-	dst[++j] = '\0';
-	return (dst);
-}
-
-char	*ft_strchr(const char *s, int c)
-{
-	size_t			i;
-	unsigned char	*ss;
-
-	ss = (unsigned char *)s;
-	i = -1;
-	while (++i < ft_strlen(s))
-		if (ss[i] == (char)c)
-			return ((char *)&ss[i]);
-	if (ss[i] == (char)c)
-		return ((char *)&ss[i]);
-	return (NULL);
-}
-
