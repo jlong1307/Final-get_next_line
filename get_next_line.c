@@ -6,13 +6,13 @@
 /*   By: jlong <jlong@student.s19.be>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/05 10:12:59 by jlong             #+#    #+#             */
-/*   Updated: 2021/05/17 10:30:39 by jlong            ###   ########.fr       */
+/*   Updated: 2021/05/17 10:46:05 by jlong            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*get_save(char *save)
+char	*line_save(char *save)
 {
 	char	*save_next;
 	int		i;
@@ -84,7 +84,7 @@ int	get_next_line(int fd, char **line)
 	}
 	free(buff);
 	*line = next_line(save_line);
-	save_line = get_save(save_line);
+	save_line = line_save(save_line);
 	if (reader == 0)
 		return (0);
 	return (1);
